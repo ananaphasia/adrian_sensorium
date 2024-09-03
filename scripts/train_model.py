@@ -50,15 +50,25 @@ set_seed( config['model_seed'] )  # seed all random generators
 ## DATALOADER
 ######################################
 if config['data_sets'][0] == 'all':
-    basepath = "notebooks/data/"
-    filenames = [os.path.join(basepath, file) for file in os.listdir(basepath) if ".zip" in file ]
-    filenames = [file for file in filenames if 'static26872-17-20' not in file]
+    # basepath = "notebooks/data/"
+    # filenames = [os.path.join(basepath, file) for file in os.listdir(basepath) if ".zip" in file ]
+    # filenames = [file for file in filenames if 'static26872-17-20' not in file]
+    basepath = "notebooks/data/IM_prezipped"
+    # Add Add folders two levels deep from basepath into a list
+    # First level
+    folders = [os.path.join(basepath, name) for name in os.listdir(
+        basepath) if os.path.isdir(os.path.join(basepath, name)) and not "merged_data" in name]
+    # Second level
+    folders = [os.path.join(folder, name) for folder in folders for name in os.listdir(
+        folder) if os.path.isdir(os.path.join(folder, name)) and not "merged_data" in name]
+    folders = [x.replace("\\", "/") for x in folders]
+    folders
 else:
     filenames = config['data_sets']
     # filenames like ['notebooks/data/static21067-10-18-GrayImageNet-94c6ff995dac583098847cfecd43e7b6.zip', ]
 
 dataset_fn = config['dataset_fn']  # 'sensorium.datasets.static_loaders'
-dataset_config = {'paths': filenames,
+dataset_config = {'paths': folders, # filenames
                   **config['dataset_config'],
                  }
 
@@ -159,5 +169,10 @@ if config['save_csv']:
 if config['save_predictions_npy']:
     # save also the predictions for each neuron
     np.save( os.path.join(save_folder, model_name+'.npy'), sorted_res)
+
+try:
+    print(df.groupby('dataset').describe())
+except:
+    pass
 
 print_t('Done with evaluation. Exiting...')

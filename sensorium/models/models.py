@@ -18,7 +18,6 @@ from .readouts import MultipleFullGaussian2d
 from .utility import prepare_grid
 
 
-
 def modulated_stacked_core_full_gauss_readout(
     dataloaders,
     seed,
@@ -91,7 +90,8 @@ def modulated_stacked_core_full_gauss_readout(
     # Obtain the named tuple fields from the first entry of the first dataloader in the dictionary
     batch = next(iter(list(dataloaders.values())[0]))
     in_name, out_name = (
-        list(batch.keys())[:2] if isinstance(batch, dict) else batch._fields[:2]
+        list(batch.keys())[:2] if isinstance(
+            batch, dict) else batch._fields[:2]
     )
 
     session_shape_dict = get_dims_for_loader_dict(dataloaders)
@@ -105,7 +105,8 @@ def modulated_stacked_core_full_gauss_readout(
     )
 
     set_random_seed(seed)
-    grid_mean_predictor, grid_mean_predictor_type, source_grids = prepare_grid(grid_mean_predictor, dataloaders)
+    grid_mean_predictor, grid_mean_predictor_type, source_grids = prepare_grid(
+        grid_mean_predictor, dataloaders)
 
     core = Stacked2dCore(
         input_channels=core_input_channels,
@@ -170,24 +171,26 @@ def modulated_stacked_core_full_gauss_readout(
             )
     if with_modulator:
         modulator = nn.ModuleDict()
-        
+
         # add entries for each key
         for key in data_keys:
             if modulator_type == 'HistoryStateGain':
                 # TODO: remove hardcoded path
-                path_template = 'notebooks/data/static{}-GrayImageNet-94c6ff995dac583098847cfecd43e7b6/merged_data/trial_id.npy'
-                
+                # path_template = 'notebooks/data/static{}-GrayImageNet-94c6ff995dac583098847cfecd43e7b6/merged_data/trial_id.npy'
+                merged_path = f"notebooks/data/IM_prezipped/{key.split('-')[0]}/{'_'.join(key.split('-')[1].split('_')[1:])}/merged_data/trial_id.npy"
+
                 nr_neurons = n_neurons_dict[key]
-                nr_trials = np.load( path_template.format(key) ).shape[0]
+                # nr_trials = np.load(path_template.format(key)).shape[0]
+                nr_trials = np.load(merged_path).shape[0]
                 modulator[key] = HistoryStateGainModulator(nr_neurons=nr_neurons,
-                                                         nr_trials=nr_trials,
-                                                         **modulator_params,
-                                                         )
+                                                           nr_trials=nr_trials,
+                                                           **modulator_params,
+                                                           )
             else:
                 raise Exception('Unkown modulator_type')
     else:
-        modulator=None
-    
+        modulator = None
+
     model = ModulatedFiringRateEncoder(
         core=core,
         readout=readout,
@@ -197,9 +200,6 @@ def modulated_stacked_core_full_gauss_readout(
     )
 
     return model
-
-
-
 
 
 def stacked_core_full_gauss_readout(
@@ -271,7 +271,8 @@ def stacked_core_full_gauss_readout(
     # Obtain the named tuple fields from the first entry of the first dataloader in the dictionary
     batch = next(iter(list(dataloaders.values())[0]))
     in_name, out_name = (
-        list(batch.keys())[:2] if isinstance(batch, dict) else batch._fields[:2]
+        list(batch.keys())[:2] if isinstance(
+            batch, dict) else batch._fields[:2]
     )
 
     session_shape_dict = get_dims_for_loader_dict(dataloaders)
@@ -285,7 +286,8 @@ def stacked_core_full_gauss_readout(
     )
 
     set_random_seed(seed)
-    grid_mean_predictor, grid_mean_predictor_type, source_grids = prepare_grid(grid_mean_predictor, dataloaders)
+    grid_mean_predictor, grid_mean_predictor_type, source_grids = prepare_grid(
+        grid_mean_predictor, dataloaders)
 
     core = Stacked2dCore(
         input_channels=core_input_channels,
