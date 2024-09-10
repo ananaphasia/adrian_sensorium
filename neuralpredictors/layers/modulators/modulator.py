@@ -3,6 +3,9 @@ from torch import nn
 from torch.nn import ModuleDict
 import numpy as np
 from scipy import signal
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class HistoryStateGainModulator(nn.Module):
@@ -79,13 +82,21 @@ class HistoryStateGainModulator(nn.Module):
         
         if self.include_history:
             # compute effect of history
-            hist = torch.einsum( 'bnh,nh->bn', history, self.history_weights )
+            if history is None or self.history_bias is None:
+                # logger.warning('History is not given or not initialized')
+                hist = torch.zeros( (x.shape[0], x.shape[1]) ).to(device)
+            else:
+                hist = torch.einsum( 'bnh,nh->bn', history, self.history_weights )
             hist = hist + self.history_bias
             x = x + hist    # add history
             
         # add additional signal based on the behavioral state
         if self.behav_state:
-            state_mod = self.state_encoder( state )
+            if state is None:
+                # logger.warning('Behavioral state is not given')
+                state_mod = torch.zeros( (x.shape[0], x.shape[1]) ).to(device)
+            else:
+                state_mod = self.state_encoder( state )
             x = x + nn.functional.elu( state_mod )
             
 
@@ -93,7 +104,7 @@ class HistoryStateGainModulator(nn.Module):
         x = nn.functional.elu(x) + 1
         
         # modify stimulus response with gain
-        if self.include_gain:
+        if self.include_gain and rank_id is not None:
             # transform rank_ids into one-hot encoding
             nr_batch = x.shape[0]
             one_hot = torch.zeros( (nr_batch, 1, self.nr_trials)).to(device)

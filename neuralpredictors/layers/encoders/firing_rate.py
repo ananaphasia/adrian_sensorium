@@ -1,5 +1,8 @@
 from torch import nn
+import logging
+import torch
 
+logger = logging.getLogger(__name__)
 
 class ModulatedFiringRateEncoder(nn.Module):
     def __init__(self, core, readout, *, shifter=None, modulator=None, elu_offset=0.0):
@@ -42,8 +45,11 @@ class ModulatedFiringRateEncoder(nn.Module):
 
         if self.shifter:
             if pupil_center is None:
-                raise ValueError("pupil_center is not given")
-            shift = self.shifter[data_key](pupil_center, trial_idx)
+                # raise ValueError("pupil_center is not given")
+                # logger.warning("pupil_center is not given")
+                shift = torch.tensor([0]).unsqueeze(0).to(x.device)
+            else:
+                shift = self.shifter[data_key](pupil_center, trial_idx)
 
         x = self.readout(x, data_key=data_key, shift=shift, **kwargs)
 

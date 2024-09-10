@@ -551,6 +551,7 @@ class FullGaussian2d(Readout):
         Returns:
             y: neuronal activity
         """
+
         N, c, w, h = x.size()
         c_in, w_in, h_in = self.in_shape
         if (c_in, w_in, h_in) != (c, w, h):
