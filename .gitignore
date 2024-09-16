@@ -34,3 +34,7 @@ saved_models
 
 # Keep result CSVs
 !notebooks/submission_m4/results/*.csv
+
+# Keep model weights
+!notebooks/saved_models/*.npy
+!notebooks/saved_models/*.pth
