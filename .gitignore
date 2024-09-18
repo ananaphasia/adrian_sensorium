@@ -30,6 +30,7 @@ logs/
 *.csv
 notebooks/data
 notebooks/lurz2020
+saved_models/backups
 
 # Keep result CSVs
 !notebooks/submission_m4/results/*.csv
