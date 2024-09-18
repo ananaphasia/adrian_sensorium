@@ -33,9 +33,3 @@ notebooks/lurz2020
 
 # Keep result CSVs
 !notebooks/submission_m4/results/*.csv
-
-# Keep model weights
-!saved_models
-!saved_models/*
-!saved_models/*.npy
-!saved_models/*.pth
