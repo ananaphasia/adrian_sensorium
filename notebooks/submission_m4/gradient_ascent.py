@@ -27,6 +27,7 @@ def gradient_ascent(
     shape: Tuple[int, ...] = (1, 1, 100, 100),
     unit: Optional[int] = None,
     set_seed: Callable = torch.manual_seed,
+    model_config: Optional[Dict] = None,
     mei_class: Type = optimization.MEI,
     import_func: Callable = import_object,
     optimize_func: Callable = optimization.optimize,
@@ -163,6 +164,7 @@ def gradient_ascent(
     }
     mei = mei_class(
         model,
+        func_config = model_config,
         initial=initial_guess,
         optimizer=optimizer,
         transparency=transparency,
